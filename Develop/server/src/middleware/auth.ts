@@ -10,14 +10,16 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.header("Authorization")?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Access Denied" });
-
   try {
+    const token = req.header("Authorization")?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "Unauthorized" });
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
-    req.user = decoded;
+
+
+    req.user = decoded; // Ensure Request type allows `user` field
     next();
-  } catch (err) {
-    res.status(403).json({ message: "Invalid Token" });
+  } catch (error) {
+    return res.status(403).json({ message: "Forbidden" });
   }
 };

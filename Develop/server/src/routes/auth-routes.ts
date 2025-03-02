@@ -1,26 +1,30 @@
-import { Router, Request, Response } from "express";
-import { User } from "../models/user";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 
-const router = Router();
 
-// POST /login - Login a user
-router.post("/login", async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  const user = await User.findOne({ where: { username } });
+interface JwtPayload {
+  username: string;
+}
 
-  if (!user) return res.status(400).json({ message: "User not found" });
 
-  const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword)
-    return res.status(400).json({ message: "Invalid password" });
+const authenticateToken: RequestHandler = (req: Request & { user?: JwtPayload }, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: "Unauthorized: No token provided" });
+    }
 
-  const token = jwt.sign({ username }, process.env.JWT_SECRET as string, {
-    expiresIn: "1h",
-  });
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: Malformed token" });
+    }
 
-  res.json({ token });
-});
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+    req.user = decoded; 
+    next();
+  } catch (error) {
+    return res.status(403).json({ message: "Forbidden: Invalid token" });
+  }
+};
 
-export default router;
+export default authenticateToken;

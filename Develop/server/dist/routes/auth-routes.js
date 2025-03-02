@@ -1,20 +1,20 @@
-import { Router } from "express";
-import { User } from "../models/user";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-const router = Router();
-// POST /login - Login a user
-router.post("/login", async (req, res) => {
-    const { username, password } = req.body;
-    const user = await User.findOne({ where: { username } });
-    if (!user)
-        return res.status(400).json({ message: "User not found" });
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword)
-        return res.status(400).json({ message: "Invalid password" });
-    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-    });
-    res.json({ token });
-});
-export default router;
+const authenticateToken = (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+        const token = authHeader.split(" ")[1];
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: Malformed token" });
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    }
+    catch (error) {
+        return res.status(403).json({ message: "Forbidden: Invalid token" });
+    }
+};
+export default authenticateToken;
