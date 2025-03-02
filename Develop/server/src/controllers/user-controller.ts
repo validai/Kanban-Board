@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { User } from "../models/user";
 
-// Fetch all users (excluding passwords)
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users = await User.findAll({ attributes: { exclude: ["password"] } });
@@ -11,7 +9,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-// Fetch a user by ID
+
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -27,7 +25,6 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-// Create a new user
 export const createUser = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
@@ -38,7 +35,6 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-// Update user details
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -57,7 +53,7 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-// Delete a user
+
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -74,7 +70,6 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-// Export all functions
 export default {
   getAllUsers,
   getUserById,

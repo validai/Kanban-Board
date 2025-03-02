@@ -17,7 +17,7 @@ export const authenticateToken = (
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
 
 
-    req.user = decoded; // Ensure Request type allows `user` field
+    req.user = decoded; 
     next();
   } catch (error) {
     return res.status(403).json({ message: "Forbidden" });

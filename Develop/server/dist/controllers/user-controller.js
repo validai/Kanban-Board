@@ -1,15 +1,12 @@
-import { User } from "../models/user";
-// Fetch all users (excluding passwords)
 export const getAllUsers = async (req, res) => {
     try {
         const users = await User.findAll({ attributes: { exclude: ["password"] } });
-        return res.json(users);
+        res.json(users);
     }
     catch (error) {
-        return res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
-// Fetch a user by ID
 export const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -20,21 +17,19 @@ export const getUserById = async (req, res) => {
         return res.json(user);
     }
     catch (error) {
-        return res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
-// Create a new user
 export const createUser = async (req, res) => {
     try {
         const { username, password } = req.body;
         const newUser = await User.create({ username, password });
-        return res.status(201).json(newUser);
+        res.status(201).json(newUser);
     }
     catch (error) {
-        return res.status(400).json({ message: error.message });
+        res.status(400).json({ message: error.message });
     }
 };
-// Update user details
 export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -47,10 +42,9 @@ export const updateUser = async (req, res) => {
         return res.json({ message: "User updated successfully" });
     }
     catch (error) {
-        return res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
-// Delete a user
 export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -62,6 +56,13 @@ export const deleteUser = async (req, res) => {
         return res.json({ message: "User deleted successfully" });
     }
     catch (error) {
-        return res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
+};
+export default {
+    getAllUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser,
 };
